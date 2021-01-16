@@ -1,0 +1,225 @@
+04 de dezembro de 2020
+*********************************************************************
+
+Para obter o iso de instalação:
+
+    wget -i  #procurar iso em https://www.archlinux.org/download/
+
+
+*********************************************************************
+
+Para obter a bootable usb:
+
+    wget -i #balenaetcher ou ventoy
+    
+
+*********************************************************************
+
+AGORA DAR O "SIGA"!!!
+(AVISO: na maquina virtual é necessário, antes de iniciar a maquina e depois de criar a base, garantir que a opção de EFI esta checkada.)
+
+    1.Arch Linux install medium (x86_64,uefi)
+    
+    2.Mudar o teclado (para mais opções "#ls usr/share/kbd/keymaps/**/*.map.gz)
+     
+        #loadkeys pt-latin1
+        
+    3.Verificar ou Estabelecer conexão à internet
+        
+        #ping -c 4 archlinux.org
+        (SE:
+            não aparecer 4 frazes iniciadas por "64 bytes..."
+         
+         ENTÃO:
+            #iwctl
+            [iwd]#device list
+                **na coluna name encontra o nome da placa de rede
+            [iwd]#station Name scan
+            [iwd]#station Name get-networks
+            [iwd]#station Name connect Network name
+            [iwd]#exit
+        )
+        
+    4.Setup System Clock ou Enable Network Time Protocol
+    
+        #timedatectl set-ntp true
+        
+    5.Verificar se o bootmode é o EFI
+    
+        #ls -l /sys/firmware/efi/efivars
+        (SE: não imprimir uma lista de directorios
+         ENTÃO: Modar o default bootmode para UEFI
+        )
+    
+    6.Listar Discos
+    
+        #fdisk -l
+        (EXEMPLO:
+         "Disk /dev/sda: 64 GiB, 68783752836 bytes, 134214683
+         "Disk model : VBOX HARDDISK
+         "Units: sector of 1 * 512 = 512 bytes
+         "Sector size (logical/physical)
+         "I/O size (minimum/optimal): 512 bytes / 512 bytes
+         "
+         "
+         "Disk /dev/loop0: 610.11 MiB, 623456789 bytes, 1249512 sectores
+         "Units: sectors of 1* 512 = 512 bytes
+         "Sector size (logical/physical): 512 bytes / 512 bytes
+         "I/O size (minimum/optimal): 512 bytes / 512 bytes
+        )
+        
+    7.Anotar o nome no disco de entre os impressos no passo (6)
+    
+    8.Iniciar a partição do disco
+    
+        #gdisk /dev/sda
+        
+    9.Particionar
+
+        9.0.Nova Tabela
+            -"Comman (? for help):"o
+            -"Proceed? (Y/N):"y
+        9.1./boot/efi
+            -"Comman (? for help):"n
+            -"Partition number (1-128, default 1):"
+            -"First sector...:"
+            -"Last sector...:"+512M
+            -"Hex code...:"ef00
+        9.2.swap
+            -"Comman (? for help):"n
+            -"Partition number (1-128, default 1):"
+            -"First sector...:"
+            -"Last sector...:"+4G
+            -"Hex code...:"8200
+        9.3./
+            -"Comman (? for help):"n
+            -"Partition number (1-128, default 1):"
+            -"First sector...:"
+            -"Last sector...:"
+            -"Hex code...:"
+        9.4.Guardar alterações
+            -"Comman (? for help):"w
+            -"Do you want to proceed? (Y/N):"y
+
+    10.Identificar partições
+    
+        #lsblk
+        (EXEMPLO:/dev/sda1 e /dev/sda2 e /dev/sdsa3)
+        
+    11.Formatar as Partições
+    
+        #mkfs.fat /dev/sda1
+        #mkswap /dev/sda2
+        #mkfs.ext4 /dev/sda3 /mnt
+        
+    12.Montar as partições
+    
+        #mount /dev/sda3 /mnt
+        #mkdir -p /mnt/boot/efi
+        #mount /dev/sda1 /mnt/boot/efi
+        #swapon /dev/sda2
+        
+    13.Instalar o basico
+    
+        #pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr intel-ucode iwd networkmanager network-manager-applet man bash-completion nano vim gdm gnome gnome-tweaks firefox termite alacritty code
+        
+         
+        
+        # blues bluez-utils cups xf86-video-qxl xf86-video-intel xf86-video-amd xorg virtualbox virtualbox-ext-vnc virtualbox-guest-iso virtualbox-guest-utils virtualbox-sdk phpvirtualbox libvirt libreoffice-still linux-latest-vistualbox-guest-modules linux-latest-vistualbox-host-modules linux59-rt-virtualbox-guest-modules linux59-rt-virtualbox-host-modules linux59-virtualbox-guest-modules linux59-virtualbox-host-modules
+        
+    14.Atualizar o file system tab
+        
+        #genfstab -U /mnt >> /mnt/etc/fstab
+        
+    15.Mudar para o sistema montado
+        
+        #arch-chroot /mnt
+        
+    16.Definir Timezone
+    
+        #ln -sf /usr/share/zoneinfo/Europe/Lisbon /etc/localtime
+    
+    17.Ajustar o relogio do sitema em função do hardware clock
+        
+        #hwclock --systohc
+    
+    18.Editar o Locale
+        
+        18.1.Abrir ficheiro
+            #nano /etc/locale.gen
+        18.2.Encontrar a linha que diz: "#  en_US.UTF-8 UTF-8"
+        18.3.Tirar o "#  " deixando ficar o "en_US.UTF-8 UTF-8"
+        
+    19.Ler o ficheiro criado no passo (18)
+    
+        #locale-gen
+    
+    20.Lingua do sistema pt_PT.UTF-8
+    
+        #echo 'LANG=en_US.UTF-8' >> /etc/locale.conf
+        
+    21.Configurar Keymaps
+    
+    	#echo 'KEYMAP=pt-latin1' > /etc/vconsole.conf
+        
+    21.Criar o hostname
+        
+        #echo 'nomedamaquina' >> /etc/hostname
+        
+    21.Configurar hosts
+    
+        21.1.Abrir ficheiro
+            #nano /etc/hosts
+        21.2.Escrever:
+            "127.0.0.1      localhost
+            "::1            localhost
+            "127.0.1.1      nomedamaquina.localdomain nomedamaquina 
+            
+    22.Criar disco de ram inicial
+    
+        #mkinitcpio -P
+        
+    23.Criar password para a root
+        
+        #passwd
+        
+    24.Instalar o bootloader (GRUB2)
+    
+        #grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=GRUB
+        
+    25.Configurar GRUB
+    
+        #grub-mkconfig -o /boot/grub/grub.cfg
+        
+    26.Configurar Display Manager
+    
+        #systemctl enable gdm
+        #+ set-default graphical.target
+        
+    27.Activar Network ao iniciar sessão
+    
+        #systemctl enable NetworkManager
+	#systemctl enable iwd.sercvice
+        
+    28.Adicionar um utiliazdor capaz de iniciar no GUI
+    
+        28.1.Criar utilizador
+            #useradd -m -G adm,audio,video,network,wheel,storage,rfkill,scanner -s /bin/bash nomedeutilizador
+        28.2.Defini pass
+            #passwd nomedeutilizador
+        28.3.Adicionar aos sudoers
+            28.3.1.Abrir ficheiro
+                #nano /etc/sudoers
+            28.3.2.Descomentar a linha que diz "%wheel ALL=(ALL) ALL
+            
+    29.Sair do arch-chroot
+    
+        #exit
+        
+    30.Garantir que todo fica escrito no disco
+    
+        #sync
+    
+    31.Dar reboot e curtir
+    
+        #sudo systemctl reboot
