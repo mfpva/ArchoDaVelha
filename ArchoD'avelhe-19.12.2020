@@ -121,7 +121,7 @@ AGORA DAR O "SIGA"!!!
         
     13.Instalar o basico
     
-        #pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr intel-ucode iwd networkmanager network-manager-applet man bash-completion nano vim gdm gnome gnome-tweaks firefox termite alacritty code
+        #pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr intel-ucode xf86-video-intel iwd networkmanager network-manager-applet man bash-completion nano vim gdm gnome gnome-tweaks firefox termite alacritty code
         
          
         
