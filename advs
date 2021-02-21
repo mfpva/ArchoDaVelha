@@ -1,0 +1,28 @@
+#!/usr/bin/bash
+ping -c 4 archlinux.org
+
+timedatectl set-ntp true
+
+ls -l /sys/firmware/efi/efivars
+
+( echo 'o'
+echo 'y'
+echo 'n'
+echo ''
+echo ''
+echo '+512M'
+echo 'ef00'
+echo 'n'
+echo ''
+echo ''
+echo '+4G'
+echo '8200'
+echo 'n'
+echo ''
+echo ''
+echo ''
+echo ''
+echo 'w'
+echo 'y' ) | gdisk /dev/sda
+
+lsblk
