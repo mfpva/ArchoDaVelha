@@ -26,3 +26,20 @@ echo 'w'
 echo 'y' ) | gdisk /dev/sda
 
 lsblk
+
+mkfs.fat /dev/sda1
+mkswap /dev/sda2
+mkfs.ext4 /dev/sda3
+
+mount /dev/sda3 /mnt
+mkdir -p /mnt/boot/efi
+mount /dev/sda1 /mnt/boot/efi
+swapon /dev/sda2
+
+pacstrap /mnt base base-devel linux linux-firmware linux-headers grub efibootmgr intel-ucode xf86-video-intel iwd networkmanager network-manager-applet man bash-completion nano vim gdm gnome gnome-tweaks firefox termite alacritty
+
+genfstab -U /mnt >> /mnt/etc/fstab
+
+arch-chroot /mnt
+
+echo 'Funcionou mpt!!!'

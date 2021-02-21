@@ -110,7 +110,7 @@ AGORA DAR O "SIGA"!!!
     
         #mkfs.fat /dev/sda1
         #mkswap /dev/sda2
-        #mkfs.ext4 /dev/sda3 /mnt
+        #mkfs.ext4 /dev/sda3
         
     12.Montar as partições
     
