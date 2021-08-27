@@ -42,4 +42,8 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 arch-chroot /mnt
 
+sync
+
+sudo systemctl shutdown now 
+
 echo 'Funcionou mpt!!!'
